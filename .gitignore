@@ -1,0 +1,18 @@
+# Bağımlılıklar ve derleme çıktıları
+node_modules/
+dist/
+coverage/
+
+# Gizli bilgiler ve yerel veriler (asla commit edilmemeli)
+.env
+.env.local
+*.sqlite
+*.sqlite-journal
+
+# Günlükler ve IDE dosyaları
+logs/
+*.log
+.idea/
+.vscode/
+*.iml
+workspace.xml
