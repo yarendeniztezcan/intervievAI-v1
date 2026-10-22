@@ -40,3 +40,16 @@
     @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
   }
 }
+
+/* Mobil: çentik / durum çubuğu / ana ekran çubuğu için güvenli alanlar (viewport-fit=cover ile çalışır). */
+.safe-top { padding-top: env(safe-area-inset-top); }
+#root { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Mobilde dokunma deneyimi: çift dokunma yakınlaştırmasını ve gri dokunma vurgusunu kapat. */
+html { -webkit-tap-highlight-color: transparent; }
+button, a { touch-action: manipulation; }
+
+/* iOS, 16px'ten küçük alanlara odaklanınca sayfayı yakınlaştırır; bunu önle. */
+@media (max-width: 640px) {
+  input, textarea, select { font-size: 16px; }
+}

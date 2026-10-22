@@ -17,6 +17,8 @@ module.exports = {
   JWT_SECRET: jwtSecret,
   JWT_EXPIRES_IN: '7d',
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+  // Virgülle ayrılmış ek origin'ler (ör. web sitesi adresi). Mobil uygulama origin'leri otomatik eklenir.
+  CORS_ORIGINS: (process.env.CORS_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean),
   OPENAI_MODEL: process.env.OPENAI_MODEL || 'gpt-4o-mini',
   RATE_LIMIT_MAX: parseInt(process.env.RATE_LIMIT_MAX, 10) || 300
 };

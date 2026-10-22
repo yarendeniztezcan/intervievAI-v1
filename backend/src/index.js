@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { PORT, FRONTEND_URL, RATE_LIMIT_MAX } = require('./config');
+const { PORT, FRONTEND_URL, CORS_ORIGINS, RATE_LIMIT_MAX } = require('./config');
 
 const userRoutes = require('./routes/users');
 const subjectRoutes = require('./routes/subjects');
@@ -17,7 +17,21 @@ const app = express();
 
 // Güvenlik middleware'leri
 app.use(helmet());
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+
+// İzinli origin'ler: web arayüzü + Capacitor mobil uygulaması (Android: http(s)://localhost, iOS: capacitor://localhost).
+// Origin göndermeyen istekler (curl, sunucudan sunucuya) CORS'a tabi değildir.
+const allowedOrigins = new Set([
+  FRONTEND_URL,
+  ...CORS_ORIGINS,
+  'http://localhost',
+  'https://localhost',
+  'capacitor://localhost',
+  'ionic://localhost'
+]);
+app.use(cors({
+  origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin)),
+  credentials: true
+}));
 
 if (process.env.NODE_ENV !== 'test') app.use(logger);
 

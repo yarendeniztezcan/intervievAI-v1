@@ -1,8 +1,15 @@
 import axios from 'axios';
 
-// Boş baseURL: istekler aynı origin'e gider; geliştirmede Vite proxy'si /api'yi backend'e yönlendirir.
+// Web: boş baseURL -> istekler aynı origin'e gider; geliştirmede Vite proxy'si /api'yi backend'e yönlendirir.
+// Mobil (Capacitor) uygulamada sayfa telefonun içinden (http://localhost) servis edilir, bu yüzden
+// backend adresi derleme sırasında VITE_API_URL ile verilmelidir (bkz. MOBIL.md).
+export const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+if (!API_URL && window.Capacitor?.isNativePlatform?.()) {
+  console.error('VITE_API_URL tanımlı değil: mobil uygulama backend\'e ulaşamaz.');
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL: API_URL,
   timeout: 30000,
   headers: { 'Content-Type': 'application/json' }
 });

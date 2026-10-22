@@ -16,3 +16,8 @@ logs/
 .vscode/
 *.iml
 workspace.xml
+
+# Mobil (Capacitor) derleme çıktıları
+frontend/android/
+frontend/ios/
+frontend/.env.mobile

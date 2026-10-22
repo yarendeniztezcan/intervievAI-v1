@@ -86,3 +86,21 @@ describe('Kimlik doğrulama', () => {
     expect(res.statusCode).toBe(400);
   });
 });
+
+describe('CORS (web + mobil uygulama)', () => {
+  const request = require('supertest');
+  const app = require('../src/index');
+
+  it.each(['http://localhost:5173', 'http://localhost', 'https://localhost', 'capacitor://localhost'])(
+    '%s origin\'ine izin verir',
+    async (origin) => {
+      const res = await request(app).get('/health').set('Origin', origin);
+      expect(res.headers['access-control-allow-origin']).toBe(origin);
+    }
+  );
+
+  it('bilinmeyen origin\'e izin vermez', async () => {
+    const res = await request(app).get('/health').set('Origin', 'https://evil.example');
+    expect(res.headers['access-control-allow-origin']).toBeUndefined();
+  });
+});

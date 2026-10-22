@@ -7,12 +7,19 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:mobile": "vite build --mode mobile && cap sync",
+    "mobile:icons": "npx @capacitor/assets generate --iconBackgroundColor \"#2563eb\" --splashBackgroundColor \"#2563eb\"",
+    "android": "cap open android",
+    "ios": "cap open ios"
   },
   "engines": {
     "node": ">=20.19"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
     "@monaco-editor/react": "^4.7.0",
     "axios": "^1.20.0",
     "lucide-react": "^1.61.0",
@@ -21,6 +28,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.2",
     "tailwindcss": "^4.3.3",

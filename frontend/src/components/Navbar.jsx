@@ -21,14 +21,14 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-white shadow-sm border-b safe-top">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Code className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl text-blue-600">InterviewAI</span>
+            <span className="hidden sm:inline font-bold text-xl text-blue-600">InterviewAI</span>
           </Link>
 
           <div className="flex gap-1">
@@ -40,14 +40,15 @@ const Navbar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  aria-label={item.label}
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg transition-all ${
                     isActive
                       ? 'bg-blue-50 text-blue-600'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="font-medium">{item.label}</span>
+                  <span className="hidden sm:inline font-medium">{item.label}</span>
                 </Link>
               );
             })}
@@ -57,10 +58,11 @@ const Navbar = () => {
             {authenticated ? (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                aria-label="Çıkış"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                <span className="font-medium">Çıkış</span>
+                <span className="hidden sm:inline font-medium">Çıkış</span>
               </button>
             ) : (
               <div className="flex gap-2">

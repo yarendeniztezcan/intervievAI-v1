@@ -1,0 +1,9 @@
+{
+  "appId": "com.interviewai.app",
+  "appName": "InterviewAI",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true
+  }
+}
