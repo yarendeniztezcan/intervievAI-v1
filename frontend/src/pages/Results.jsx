@@ -47,7 +47,7 @@ const Results = () => {
     .map((t) => {
       const idx = questions.map((q, i) => (q.type === t ? i : -1)).filter((i) => i >= 0);
       return {
-        label: t === 'coding' ? 'Kod soruları' : 'Sözel sorular',
+        label: t === 'coding' ? 'Kod soruları' : type === 'voice' ? 'Sözlü sorular' : 'Sözel sorular',
         points: idx.reduce((sum, i) => sum + (results[i]?.points || 0), 0),
         max: idx.length * 10
       };

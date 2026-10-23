@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Code, MessageSquare, Layers, Brain, Target, TrendingUp } from 'lucide-react';
+import { Code, MessageSquare, Mic, Layers, Brain, Target, TrendingUp } from 'lucide-react';
 import { isAuthenticated } from '../utils/auth';
 
 const Home = () => {
@@ -22,6 +22,14 @@ const Home = () => {
       icon: MessageSquare,
       color: 'bg-green-600',
       path: '/setup?type=verbal'
+    },
+    {
+      type: 'voice',
+      title: 'Sözlü Simülasyon',
+      description: 'Gerçek mülakat gibi: AI "birinci soru" diyerek soruyu sesli sorar, sen konuşarak cevaplarsın. Yazı yok; yanlışta doğru cevap okunur ve benzer soru gelir.',
+      icon: Mic,
+      color: 'bg-orange-500',
+      path: '/setup?type=voice'
     },
     {
       type: 'mixed',
@@ -66,7 +74,7 @@ const Home = () => {
       {/* Simulation Types */}
       <section>
         <h2 className="text-3xl font-bold text-center mb-8">Simülasyon Türleri</h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {simulationTypes.map((sim) => {
             const Icon = sim.icon;
             return (

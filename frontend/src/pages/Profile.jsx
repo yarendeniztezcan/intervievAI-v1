@@ -3,7 +3,7 @@ import { Trophy, Target, TrendingUp, Calendar, CheckCircle, XCircle } from 'luci
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
-const TYPE_LABELS = { coding: 'Kod', verbal: 'Sözel', mixed: 'Karma' };
+const TYPE_LABELS = { coding: 'Kod', verbal: 'Sözel', voice: 'Sözlü', mixed: 'Karma' };
 
 const Profile = () => {
   const [stats, setStats] = useState({

@@ -9,6 +9,7 @@ const subjectRoutes = require('./routes/subjects');
 const questionRoutes = require('./routes/questions');
 const executeRoutes = require('./routes/execute');
 const aiRoutes = require('./routes/ai');
+const speechRoutes = require('./routes/speech');
 
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./middleware/logger');
@@ -49,6 +50,7 @@ app.use('/api/subjects', subjectRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/execute', executeRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/speech', speechRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString(), version: '2.1.0' });

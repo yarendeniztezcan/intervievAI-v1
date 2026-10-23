@@ -15,7 +15,8 @@ router.use(authenticateToken);
 
 const MAX_COUNT = 30;
 const MAX_ANSWER_LENGTH = 5000;
-const VALID_TYPES = ['coding', 'verbal', 'mixed'];
+// 'voice': sözlü simülasyon. Sorular sözel sorularla aynıdır; fark cevabın konuşarak verilmesidir.
+const VALID_TYPES = ['coding', 'verbal', 'voice', 'mixed'];
 
 const toCount = (value, fallback) => Math.min(Math.max(parseInt(value, 10) || fallback, 1), MAX_COUNT);
 const toList = (value) => (Array.isArray(value) ? value.filter((v) => typeof v === 'string') : []);
@@ -32,7 +33,7 @@ async function linkToSimulation(simulationId, questionId, isAdaptive) {
 /**
  * Simülasyonu başlatır.
  *  - type "coding": { count, language, level, courses }
- *  - type "verbal": { count, level, courses }
+ *  - type "verbal" | "voice": { count, level, courses }
  *  - type "mixed" : { codingCount, verbalCount, language, level, codingCourses, verbalCourses }
  * Dönüş: { simulationId, questions } — kod soruları önce, sözel sorular sonra gelir.
  */
@@ -50,7 +51,7 @@ router.post('/start', async (req, res) => {
         language
       });
     }
-    if (type === 'verbal' || type === 'mixed') {
+    if (type === 'verbal' || type === 'voice' || type === 'mixed') {
       jobs.push({
         type: 'verbal',
         count: toCount(type === 'mixed' ? req.body.verbalCount : req.body.count, 5),

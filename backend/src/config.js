@@ -20,5 +20,9 @@ module.exports = {
   // Virgülle ayrılmış ek origin'ler (ör. web sitesi adresi). Mobil uygulama origin'leri otomatik eklenir.
   CORS_ORIGINS: (process.env.CORS_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean),
   OPENAI_MODEL: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+  // Sözlü simülasyon: konuşmayı yazıya çevirme (STT) ve yazıyı konuşmaya çevirme (TTS)
+  OPENAI_STT_MODEL: process.env.OPENAI_STT_MODEL || 'gpt-4o-mini-transcribe',
+  OPENAI_TTS_MODEL: process.env.OPENAI_TTS_MODEL || 'gpt-4o-mini-tts',
+  OPENAI_TTS_VOICE: process.env.OPENAI_TTS_VOICE || 'alloy',
   RATE_LIMIT_MAX: parseInt(process.env.RATE_LIMIT_MAX, 10) || 300
 };

@@ -11,6 +11,7 @@ AI destekli kodlama ve sözel mülakat pratiği platformu. Sorular seçtiğin de
 - **Seviyeler:** Junior / Mid-Level / Senior (soru tarzını ve zorluğunu belirler).
 - Kod çalıştırma (Python, C, Java), aşamalı ipucu, serbest soru gezinmesi, puanlama, profil ve zayıf konu raporu.
 - Profilden doğru / yanlış cevaplanan soruları tekrar çözme.
+- **Sözlü simülasyon:** AI "birinci soru" diyerek soruyu sesli sorar, sen mikrofonla konuşarak cevaplarsın (yazı yok). Konuşman yazıya çevrilip onayına sunulur, değerlendirilir; yanlışta doğru cevap okunur ve benzer soru gelir. Bitirince sonuçlar yazılı simülasyonla aynıdır. Bkz. [SOZLU.md](SOZLU.md).
 - **Mobil:** Android / iOS uygulaması (Capacitor) ve PWA desteği — bkz. [MOBIL.md](MOBIL.md).
 
 ## Klasör yapısı
@@ -37,6 +38,7 @@ AI destekli kodlama ve sözel mülakat pratiği platformu. Sorular seçtiğin de
 │   │   └── styles/
 │   └── Dockerfile
 ├── docker-compose.yml
+├── SOZLU.md                 Sözlü (sesli) simülasyon: nasıl çalışır, ayarlar
 ├── MOBIL.md                 Mobil uygulama / PWA kurulumu
 └── DEGISIKLIKLER.md         Yeniden düzenlemede neyin değiştiği
 ```

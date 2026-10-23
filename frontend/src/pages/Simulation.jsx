@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Code, MessageSquare, Flag, CheckCircle, Loader2 } from 'lucide-react';
+import { Code, MessageSquare, Mic, Flag, CheckCircle, Loader2, Volume2 } from 'lucide-react';
 import CodingPanel from '../components/CodingPanel';
 import VerbalPanel from '../components/VerbalPanel';
 import api, { AI_TIMEOUT, errorMessage } from '../utils/api';
+import { unlockAudio, stopSpeaking, requestMic, voiceSupport, micErrorMessage } from '../utils/voice';
 import { LEVEL_LABELS } from '../utils/constants';
 
 const parseList = (value) => (value || '').split(',').filter(Boolean);
@@ -25,14 +26,16 @@ const SectionHeader = ({ icon: Icon, color, title, subtitle }) => (
  * Simülasyon sayfası.
  *  - karma  : sol tarafta kod soruları, sağ tarafta sözel sorular (yan yana)
  *  - kod    : yalnızca kod soruları
- *  - sözel  : yalnızca sözel sorular
+ *  - sözel  : yalnızca sözel sorular (yazarak cevaplanır)
+ *  - sözlü  : sözel sorular, ama AI soruyu sesli sorar ve kullanıcı konuşarak cevaplar (yazı yok)
  */
 const Simulation = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const requestedType = searchParams.get('type');
-  const type = ['coding', 'verbal', 'mixed'].includes(requestedType) ? requestedType : 'mixed';
+  const type = ['coding', 'verbal', 'voice', 'mixed'].includes(requestedType) ? requestedType : 'mixed';
+  const isVoice = type === 'voice';
   const level = searchParams.get('level') || 'mid';
   const language = searchParams.get('language') || 'python';
   const codingCount = parseCount(searchParams.get('codingCount'));
@@ -43,13 +46,15 @@ const Simulation = () => {
   const [session, setSession] = useState({ loading: true, error: '', questions: [], simulationId: null });
   const [results, setResults] = useState([]);
   const [finishing, setFinishing] = useState(false);
+  const [voiceReady, setVoiceReady] = useState(false); // sözlü simülasyon: mikrofon izni alındı ve ses açıldı
+  const [voiceError, setVoiceError] = useState('');
   const started = useRef(false);
 
   const start = async () => {
     setSession({ loading: true, error: '', questions: [], simulationId: null });
     const body = type === 'coding'
       ? { type, count: codingCount, courses: codingCourses, language, level }
-      : type === 'verbal'
+      : type === 'verbal' || isVoice
         ? { type, count: verbalCount, courses: verbalCourses, level }
         : { type, codingCount, verbalCount, codingCourses, verbalCourses, language, level };
     try {
@@ -80,7 +85,25 @@ const Simulation = () => {
   const answeredCount = questions.filter((q) => results.some((r) => r.questionId === q.id)).length;
   const allAnswered = questions.length > 0 && answeredCount === questions.length;
 
+  // Sayfadan ayrılırken AI'nın konuşması kesilir.
+  useEffect(() => () => stopSpeaking(), []);
+
+  // Tıklamayla çağrılır: sesli okumayı ve mikrofonu hazırlar (tarayıcılar bunu tıklama olmadan engeller).
+  const beginVoice = async () => {
+    setVoiceError('');
+    unlockAudio();
+    const support = voiceSupport();
+    if (!support.ok) { setVoiceError(support.reason); return; }
+    try {
+      await requestMic();
+      setVoiceReady(true);
+    } catch (e) {
+      setVoiceError(micErrorMessage(e));
+    }
+  };
+
   const finish = async () => {
+    stopSpeaking();
     const unanswered = questions.length - answeredCount;
     if (unanswered > 0 &&
         !window.confirm(`${unanswered} soru cevapsız. Cevapsız sorular "Atlandı" sayılacak (0 puan). Bitirmek istiyor musunuz?`)) {
@@ -124,7 +147,32 @@ const Simulation = () => {
     );
   }
 
-  const title = type === 'mixed' ? 'Karma Simülasyon' : type === 'coding' ? 'Kod Simülasyonu' : 'Sözel Simülasyon';
+  if (isVoice && !voiceReady) {
+    return (
+      <div className="card max-w-xl mx-auto text-center space-y-5">
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-orange-500 flex items-center justify-center">
+          <Mic className="w-8 h-8 text-white" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold">Sözlü Simülasyon</h2>
+          <p className="text-gray-600 mt-1">{questions.length} soru hazır • {LEVEL_LABELS[level] || level}</p>
+        </div>
+        <ul className="text-left text-sm text-gray-700 space-y-2 bg-gray-50 rounded-lg p-4">
+          <li className="flex gap-2"><Volume2 size={16} className="mt-0.5 shrink-0 text-orange-600" /> AI her soruyu sesli okur ("Birinci soru…").</li>
+          <li className="flex gap-2"><Mic size={16} className="mt-0.5 shrink-0 text-orange-600" /> Mikrofon düğmesine basıp cevabını konuşarak ver, bitince tekrar bas.</li>
+          <li className="flex gap-2"><MessageSquare size={16} className="mt-0.5 shrink-0 text-orange-600" /> Söylediklerin yazıya çevrilir; onayladıktan sonra değerlendirilir. Yanlışsa doğru cevap okunur ve benzer soru gelir.</li>
+        </ul>
+        <p className="text-xs text-gray-500">Sessiz bir ortamda ol ve tarayıcı mikrofon izni isterse <strong>İzin ver</strong> de.</p>
+        {voiceError && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded">{voiceError}</div>}
+        <div className="flex gap-3 justify-center">
+          <button className="btn-primary flex items-center gap-2" onClick={beginVoice}><Mic size={16} /> Başla</button>
+          <button className="btn-secondary" onClick={() => navigate('/setup?type=voice')}>Ayarlara Dön</button>
+        </div>
+      </div>
+    );
+  }
+
+  const title = type === 'mixed' ? 'Karma Simülasyon' : type === 'coding' ? 'Kod Simülasyonu' : isVoice ? 'Sözlü Simülasyon' : 'Sözel Simülasyon';
 
   return (
     <div className="space-y-6">
@@ -174,12 +222,18 @@ const Simulation = () => {
 
         {hasVerbal && (
           <section className={`min-w-0 space-y-4 ${split ? '' : 'max-w-3xl mx-auto w-full'}`}>
-            <SectionHeader icon={MessageSquare} color="bg-green-600" title="Sözel Sorular" subtitle={`${verbalQuestions.length} soru • cevabını yazarak yanıtla`} />
+            <SectionHeader
+              icon={isVoice ? Mic : MessageSquare}
+              color={isVoice ? 'bg-orange-500' : 'bg-green-600'}
+              title={isVoice ? 'Sözlü Sorular' : 'Sözel Sorular'}
+              subtitle={`${verbalQuestions.length} soru • ${isVoice ? 'cevabını konuşarak ver' : 'cevabını yazarak yanıtla'}`}
+            />
             <VerbalPanel
               questions={verbalQuestions}
               results={results}
               simulationId={simulationId}
               onResult={recordResult}
+              voice={isVoice}
             />
           </section>
         )}

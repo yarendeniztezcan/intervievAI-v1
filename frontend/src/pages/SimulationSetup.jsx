@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Code, MessageSquare, Layers, ArrowRight, Briefcase, Check, Loader2 } from 'lucide-react';
+import { Code, MessageSquare, Layers, ArrowRight, Briefcase, Check, Loader2, Mic } from 'lucide-react';
 import api, { errorMessage } from '../utils/api';
 
 const COUNTS = [3, 5, 10, 15, 20];
@@ -19,7 +19,8 @@ const LEVELS = [
 
 const TYPES = [
   { id: 'coding', name: 'Kod', desc: 'Yalnızca kod soruları', icon: Code, active: 'border-blue-600 bg-blue-50 text-blue-700' },
-  { id: 'verbal', name: 'Sözel', desc: 'Yalnızca sözel sorular', icon: MessageSquare, active: 'border-green-600 bg-green-50 text-green-700' },
+  { id: 'verbal', name: 'Sözel', desc: 'Yazarak cevapla', icon: MessageSquare, active: 'border-green-600 bg-green-50 text-green-700' },
+  { id: 'voice', name: 'Sözlü', desc: 'Konuşarak cevapla', icon: Mic, active: 'border-orange-500 bg-orange-50 text-orange-700' },
   { id: 'mixed', name: 'Karma', desc: 'Sol: kod • Sağ: sözel', icon: Layers, active: 'border-purple-600 bg-purple-50 text-purple-700' }
 ];
 
@@ -76,7 +77,8 @@ const SimulationSetup = () => {
   }, []);
 
   const hasCoding = type === 'coding' || type === 'mixed';
-  const hasVerbal = type === 'verbal' || type === 'mixed';
+  const isVoice = type === 'voice';
+  const hasVerbal = type === 'verbal' || isVoice || type === 'mixed';
 
   const set = (patch) => setConfig((prev) => ({ ...prev, ...patch }));
   const toggle = (key, id) =>
@@ -108,7 +110,7 @@ const SimulationSetup = () => {
       <h2 className="text-2xl font-bold">Simülasyon Ayarları</h2>
 
       {/* Simülasyon türü */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {TYPES.map((t) => {
           const Icon = t.icon;
           return (
@@ -204,10 +206,18 @@ const SimulationSetup = () => {
           )}
 
           {hasVerbal && (
-            <SectionCard icon={MessageSquare} color="bg-green-600" title="Sözel Sorular (sağ taraf)">
+            <SectionCard
+              icon={isVoice ? Mic : MessageSquare}
+              color={isVoice ? 'bg-orange-500' : 'bg-green-600'}
+              title={isVoice ? 'Sözlü Sorular (sesli)' : 'Sözel Sorular (sağ taraf)'}
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Soru Sayısı</label>
-                <CountPicker value={config.verbalCount} onChange={(v) => set({ verbalCount: v })} accent="border-green-600 bg-green-50 text-green-700" />
+                <CountPicker
+                  value={config.verbalCount}
+                  onChange={(v) => set({ verbalCount: v })}
+                  accent={isVoice ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-green-600 bg-green-50 text-green-700'}
+                />
               </div>
 
               <div>
@@ -215,7 +225,7 @@ const SimulationSetup = () => {
                   <label className="block text-sm font-medium text-gray-700">Konu / Ders (en az 1)</label>
                   <button
                     type="button"
-                    className="text-xs text-green-700 hover:underline cursor-pointer"
+                    className="text-xs text-gray-600 hover:underline cursor-pointer"
                     onClick={() => set({ verbalCourses: allVerbalSelected ? [] : subjects.verbal.map((s) => s.id) })}
                   >
                     {allVerbalSelected ? 'Seçimi temizle' : 'Tümünü seç'}
@@ -230,11 +240,11 @@ const SimulationSetup = () => {
                         type="button"
                         onClick={() => toggle('verbalCourses', course.id)}
                         className={`w-full text-left p-3 rounded-lg border-2 transition-colors flex items-start gap-3 cursor-pointer ${
-                          selected ? 'border-green-600 bg-green-50' : 'border-gray-200 hover:border-gray-400'
+                          selected ? (isVoice ? 'border-orange-500 bg-orange-50' : 'border-green-600 bg-green-50') : 'border-gray-200 hover:border-gray-400'
                         }`}
                       >
                         <span className={`mt-0.5 w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center ${
-                          selected ? 'bg-green-600 border-green-600' : 'border-gray-300'
+                          selected ? (isVoice ? 'bg-orange-500 border-orange-500' : 'bg-green-600 border-green-600') : 'border-gray-300'
                         }`}>
                           {selected && <Check size={14} className="text-white" />}
                         </span>
@@ -250,6 +260,7 @@ const SimulationSetup = () => {
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
                   Sorular yalnızca seçtiğin derslerin konularından üretilir.
+                  {isVoice && ' Sözlü simülasyonda AI soruyu sesli sorar, sen mikrofonla cevaplarsın; mikrofon izni gerekir.'}
                 </p>
               </div>
             </SectionCard>

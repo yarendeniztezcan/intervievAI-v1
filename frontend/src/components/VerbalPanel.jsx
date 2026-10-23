@@ -1,17 +1,19 @@
 import React, { useRef, useState } from 'react';
 import { ArrowRight, Loader2, MessageSquare, RefreshCw } from 'lucide-react';
 import VerbalAnswerBox from './VerbalAnswerBox';
+import VoiceAnswerBox from './VoiceAnswerBox';
 import QuestionNavigator from './QuestionNavigator';
 import api, { AI_TIMEOUT, errorMessage } from '../utils/api';
-import { MAX_ADAPTIVE } from '../utils/constants';
+import { MAX_ADAPTIVE, ordinalQuestion } from '../utils/constants';
 
 /**
  * Sözel soru bölümü (simülasyon sayfasının sağ tarafı).
+ * `voice`: cevap yazı yerine konuşarak verilir (soru sesli okunur, cevap mikrofonla alınır).
  * Akış: soru -> kullanıcı yazarak cevaplar -> AI kontrol eder ->
  *   doğruysa: sonraki soruya geçilir
  *   yanlışsa: doğru cevap gösterilir ve aynı konudan benzer bir soru hazırlanır
  */
-const VerbalPanel = ({ questions, results, simulationId, onResult }) => {
+const VerbalPanel = ({ questions, results, simulationId, onResult, voice = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [adaptive, setAdaptive] = useState(null); // benzer (pekiştirme) soru
   const [depth, setDepth] = useState(0); // zincirdeki benzer soru sayısı
@@ -149,9 +151,20 @@ const VerbalPanel = ({ questions, results, simulationId, onResult }) => {
         </div>
       )}
 
-      <VerbalAnswerBox key={current.id} question={current} onSubmit={submit}>
-        {renderActions}
-      </VerbalAnswerBox>
+      {voice ? (
+        <VoiceAnswerBox
+          key={current.id}
+          question={current}
+          intro={adaptive ? 'Benzer soru.' : `${ordinalQuestion(currentIndex + 1)}.`}
+          onSubmit={submit}
+        >
+          {renderActions}
+        </VoiceAnswerBox>
+      ) : (
+        <VerbalAnswerBox key={current.id} question={current} onSubmit={submit}>
+          {renderActions}
+        </VerbalAnswerBox>
+      )}
     </div>
   );
 };

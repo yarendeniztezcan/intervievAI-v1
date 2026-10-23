@@ -8,10 +8,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:mobile": "vite build --mode mobile && cap sync",
+    "build:mobile": "vite build --mode mobile && cap sync && node scripts/patch-native.cjs",
     "mobile:icons": "npx @capacitor/assets generate --iconBackgroundColor \"#2563eb\" --splashBackgroundColor \"#2563eb\"",
-    "android": "cap open android",
-    "ios": "cap open ios"
+    "android": "node scripts/patch-native.cjs && cap open android",
+    "ios": "node scripts/patch-native.cjs && cap open ios"
   },
   "engines": {
     "node": ">=20.19"
